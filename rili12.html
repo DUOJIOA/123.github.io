@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2024年日历</title>
+<style>
+  body { font-family: Arial, sans-serif; }
+  .calendar { display: flex; flex-wrap: wrap; justify-content: space-around; }
+  .month { margin: 10px; }
+  .days { display: grid; grid-template-columns: repeat(7, 1fr); }
+  .day { padding: 10px; cursor: pointer; user-select: none; }
+  .day.selected { background-color: gray; color: white; pointer-events: none; }
+  .modal { display: none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+  .modal-content { background-color: white; padding: 20px; border-radius: 5px; text-align: center; }
+  .emojis { display: none; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div id="calendar" class="calendar">
+  <!-- JavaScript 生成日历 -->
+</div>
+
+<div id="modal" class="modal" onclick="closeModal()">
+  <div class="modal-content">
+    <p>恭喜你，成功拉屎</p>
+    <div id="emojis" class="emojis">😄😄😄😄😄😄😄😄😄😄</div>
+  </div>
+</div>
+
+<script>
+function generateCalendar(year) {
+  const months = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+  const calendarElement = document.getElementById('calendar');
+  months.forEach((month, index) => {
+    const monthElement = document.createElement('div');
+    monthElement.className = 'month';
+    monthElement.innerHTML = `<h3>${month}</h3><div class="days">${generateDays(year, index)}</div>`;
+    calendarElement.appendChild(monthElement);
+  });
+  restoreSelectedDays();
+}
+
+function generateDays(year, month) {
+  const date = new Date(year, month, 1);
+  let daysHtml = '';
+  while (date.getMonth() === month) {
+    daysHtml += `<div class="day" data-date="${year}-${month+1}-${date.getDate()}" onclick="selectDay(event)">${date.getDate()}</div>`;
+    date.setDate(date.getDate() + 1);
+  }
+  return daysHtml;
+}
+
+function selectDay(event) {
+  const selectedDate = event.target.getAttribute('data-date');
+  // 检查该日期是否已被选择
+  if (!event.target.classList.contains('selected')) {
+    localStorage.setItem(selectedDate, true); // 使用日期作为键保存
+    updateSelectedDay();
+    showModal();
+  }
+}
+
+function updateSelectedDay() {
+  document.querySelectorAll('.day').forEach(day => {
+    const date = day.getAttribute('data-date');
+    if (localStorage.getItem(date)) {
+      day.classList.add('selected');
+    }
+  });
+}
+
+function restoreSelectedDays() {
+  updateSelectedDay();
+}
+
+function showModal() {
+  const modal = document.getElementById('modal');
+  modal.style.display = 'flex';
+  const emojis = document.getElementById('emojis');
+  emojis.style.display = 'block';
+}
+
+function closeModal() {
+  const modal = document.getElementById('modal');
+  modal.style.display = 'none';
+  const emojis = document.getElementById('emojis');
+  emojis.style.display = 'none';
+}
+
+generateCalendar(2024);
+</script>
+
+</body>
+</html>
